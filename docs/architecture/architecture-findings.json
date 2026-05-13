@@ -1,0 +1,41 @@
+{
+  "repo": "claude-routines",
+  "date": "2026-05-12",
+  "dirty_state": "pre-existing untracked .gitignore observed",
+  "candidate_count": 3,
+  "candidates": [
+    {
+      "id": "claude-routines-1",
+      "title": "Turn each routine skill into a Routine Contract module",
+      "files": ["skills/morning-digest/SKILL.md", "skills/weekly-recap/SKILL.md", "CLAUDE.md"],
+      "problem": "The SKILL.md files describe schedules, connector calls, ranking, output caps, and delivery in prose. The Interface is shallow because a routine operator must infer required inputs, output shape, failure modes, and delivery Adapter behavior from bullets.",
+      "solution": "Add a small Routine Contract document per skill with schedule, required connectors, input query window, ranking policy, output schema, delivery target, and failure handoff.",
+      "benefits": "Locality improves because routine semantics live in one contract per routine. Leverage improves because Claude Routines, future tests, and human reviewers can use the same Interface.",
+      "test_impact": "A docs/schema lint can verify required routine fields before publishing.",
+      "risk": "Low.",
+      "suggested_validation": "rg -n \"schedule:|Output format|Post via|Append to\" skills CLAUDE.md"
+    },
+    {
+      "id": "claude-routines-2",
+      "title": "Add a Connector Adapter inventory for hosted runtime assumptions",
+      "files": ["CLAUDE.md", "skills/morning-digest/SKILL.md", "skills/weekly-recap/SKILL.md"],
+      "problem": "Runtime constraints say there is no local filesystem access and state must come through MCP servers, but each routine names tools as if they are guaranteed. Connector availability and fallback behavior are implicit.",
+      "solution": "Create a Connector Adapter inventory that states required MCP tools, auth assumptions, fallback output, and safe degraded behavior.",
+      "benefits": "Locality improves around hosted runtime assumptions. Leverage improves for adding new routines without re-learning connector limits.",
+      "test_impact": "A lightweight review checklist can fail routines that reference unknown connectors.",
+      "risk": "Low.",
+      "suggested_validation": "manual docs review"
+    },
+    {
+      "id": "claude-routines-3",
+      "title": "Define durable output envelopes for digest and recap artifacts",
+      "files": ["skills/morning-digest/SKILL.md", "skills/weekly-recap/SKILL.md"],
+      "problem": "Output examples are readable but not stable Interfaces. Downstream delivery or archiving cannot distinguish Must Act, FYI, Noise, Shipped, Stalled, and Surprises beyond prose headings.",
+      "solution": "Define a small Markdown-plus-frontmatter or JSON-sidecar envelope for routine outputs.",
+      "benefits": "Locality improves for formatting changes. Leverage improves for PushNotification, GitHub issue, or Obsidian append Adapters.",
+      "test_impact": "Snapshot-free contract tests can validate section presence and item caps.",
+      "risk": "Low.",
+      "suggested_validation": "manual docs review"
+    }
+  ]
+}
