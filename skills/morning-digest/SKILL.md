@@ -16,7 +16,32 @@ Fetch overnight signal, return one-page markdown.
 4. Output markdown: `## Must Act` / `## FYI` / `## Noise`
 5. Post via PushNotification
 
-## Output format
+## Output Envelope
+
+Envelope name: `morning-digest.v1`
+
+Required fields:
+- `generated_at`: ISO-8601 timestamp for when the digest was produced.
+- `window`: source window with `start`, `end`, and `timezone`.
+- `sections`: ordered list of `must_act`, `fyi`, and `noise` sections.
+- `items`: digest entries with `source`, `title`, `summary`, `source_ref`, `age`, and `priority_reason`.
+- `delivery`: target channel and delivery status.
+
+Optional fields:
+- `omitted_counts`: counts by source for items skipped by cap or filtering.
+- `errors`: non-fatal source fetch or delivery errors.
+
+Limits:
+- Maximum 15 items total.
+- `must_act` appears first and should stay below 5 items unless more are explicitly blocking.
+- Each item summary is one sentence.
+
+Consumer contract:
+- Consumers may rely on the envelope name, section ids, item fields, and `source_ref`.
+- Consumers must not rely on raw email bodies, full notification payloads, or hidden ranking state.
+- Source references should be durable enough to reopen the originating Gmail or GitHub item through its connector.
+
+## Markdown Rendering
 
 ```
 # Digest 2026-04-17
