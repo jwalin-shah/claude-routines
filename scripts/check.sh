@@ -4,7 +4,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 required_files=(
+  "AGENTS.md"
   "CLAUDE.md"
+  "README.md"
   "skills/morning-digest/SKILL.md"
   "skills/weekly-recap/SKILL.md"
 )
@@ -16,7 +18,13 @@ for path in "${required_files[@]}"; do
   fi
 done
 
-grep -q "^# " skills/morning-digest/SKILL.md
-grep -q "^# " skills/weekly-recap/SKILL.md
+for skill in skills/*/SKILL.md; do
+  grep -q "^---$" "$skill"
+  grep -q "^name: " "$skill"
+  grep -q "^description: " "$skill"
+  grep -q "^schedule: " "$skill"
+  grep -q "^# " "$skill"
+  grep -q "^## Output format$" "$skill"
+done
 
 echo "claude routines check ok"
