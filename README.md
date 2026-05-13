@@ -28,4 +28,5 @@ git diff --check
 ```
 
 The check script verifies required repository docs, expected routine files,
-routine frontmatter fields, and a basic output-format section for each routine.
+routine frontmatter fields, a basic output-format section, and an explicit
+hosted output destination for each routine.
