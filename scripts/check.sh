@@ -25,6 +25,7 @@ for skill in skills/*/SKILL.md; do
   grep -q "^schedule: " "$skill"
   grep -q "^# " "$skill"
   grep -q "^## Output format$" "$skill"
+  grep -Eq "(^|[[:space:]])(Post via|Append to) " "$skill"
 done
 
 echo "claude routines check ok"
