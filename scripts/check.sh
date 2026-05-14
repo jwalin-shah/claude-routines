@@ -5,9 +5,14 @@ cd "$(dirname "$0")/.."
 
 run_contract_tests=1
 print_required_files=0
+smoke_only=0
 
 case "${1:-}" in
   "")
+    ;;
+  --smoke)
+    smoke_only=1
+    run_contract_tests=0
     ;;
   --skip-contract-tests)
     run_contract_tests=0
@@ -17,7 +22,7 @@ case "${1:-}" in
     run_contract_tests=0
     ;;
   *)
-    echo "usage: $0 [--skip-contract-tests|--print-required-files]" >&2
+    echo "usage: $0 [--smoke|--skip-contract-tests|--print-required-files]" >&2
     exit 2
     ;;
 esac
@@ -94,6 +99,11 @@ fi
 
 validate_required_files
 validate_skills
+
+if [[ "$smoke_only" -eq 1 ]]; then
+  echo "claude routines smoke ok"
+  exit 0
+fi
 
 if [[ "$run_contract_tests" -eq 1 && -x tests/check-contract.sh ]]; then
   tests/check-contract.sh

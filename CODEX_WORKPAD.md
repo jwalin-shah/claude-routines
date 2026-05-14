@@ -21,6 +21,11 @@ git diff --check
 - `./scripts/check.sh`: passed.
 - `git diff --check`: passed.
 
+### Validation Evidence
+
+- `./scripts/check.sh`: passed.
+- `git diff --check`: passed.
+
 ## WP-063 Shallow Module Deepening - 2026-05-14
 
 ### Scope
@@ -60,3 +65,20 @@ git diff --check
 
 - `./scripts/check.sh`: passed.
 - `git diff --check`: passed.
+
+## WP-119 CLI Smoke Contract - 2026-05-14
+
+### Scope
+
+- Added a no-secret smoke mode to `scripts/check.sh`.
+- Updated `tests/check-contract.sh` to prove smoke success and bad-option
+  failure reporting.
+
+### Validation Contract
+
+Run:
+
+```bash
+./scripts/check.sh
+git diff --check
+```

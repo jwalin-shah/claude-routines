@@ -30,3 +30,9 @@ git diff --check
 The check script verifies required repository docs, expected routine files,
 routine frontmatter fields, a basic output-format section, and an explicit
 hosted output destination for each routine.
+
+For a no-secret entrypoint smoke check that skips nested contract tests, run:
+
+```bash
+./scripts/check.sh --smoke
+```
