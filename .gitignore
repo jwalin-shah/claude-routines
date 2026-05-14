@@ -1,2 +1,6 @@
 # CocoIndex Code (ccc)
 /.cocoindex_code/
+
+# Local routine/runtime output. Keep generated logs, caches, and smoke-test
+# artifacts out of tracked fixture and evidence files.
+/.codex-runtime/

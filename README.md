@@ -18,6 +18,12 @@ Anthropic-hosted Claude Code routines. Each routine is represented by one
 - `scripts/check.sh` validates the minimal docs and skill contract.
 - `docs/architecture/` contains portfolio audit artifacts and issue candidates.
 
+## Fixtures and Runtime Output
+
+Tracked docs and architecture files are deterministic fixtures/evidence. Local
+validation runs, generated logs, caches, and scratch outputs should use the
+ignored `.codex-runtime/` directory instead of writing beside tracked fixtures.
+
 ## Validation
 
 Run the lightweight validation contract before opening a PR:
@@ -29,7 +35,8 @@ git diff --check
 
 The check script verifies required repository docs, expected routine files,
 routine frontmatter fields, a basic output-format section, and an explicit
-hosted output destination for each routine.
+hosted output destination for each routine. It also verifies that the default
+local runtime output directory is ignored by Git.
 
 For a no-secret entrypoint smoke check that skips nested contract tests, run:
 

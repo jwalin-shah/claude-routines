@@ -82,3 +82,27 @@ Run:
 ./scripts/check.sh
 git diff --check
 ```
+
+## WP-147 Fixture Runtime Separation - 2026-05-14
+
+### Scope
+
+- Defined `.codex-runtime/` as the ignored local runtime output directory.
+- Added executable validation that the default runtime output directory stays
+  ignored by Git.
+- Documented that tracked docs and architecture files are deterministic
+  fixtures/evidence, not runtime output targets.
+
+### Validation Contract
+
+Run:
+
+```bash
+./scripts/check.sh
+git diff --check
+```
+
+### Validation Evidence
+
+- `./scripts/check.sh`: passed.
+- `git diff --check`: passed.

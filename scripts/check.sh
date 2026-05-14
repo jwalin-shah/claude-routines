@@ -5,7 +5,9 @@ cd "$(dirname "$0")/.."
 
 run_contract_tests=1
 print_required_files=0
+print_runtime_dir=0
 smoke_only=0
+runtime_output_dir="${CLAUDE_ROUTINES_RUNTIME_DIR:-.codex-runtime}"
 
 case "${1:-}" in
   "")
@@ -21,13 +23,18 @@ case "${1:-}" in
     print_required_files=1
     run_contract_tests=0
     ;;
+  --print-runtime-dir)
+    print_runtime_dir=1
+    run_contract_tests=0
+    ;;
   *)
-    echo "usage: $0 [--smoke|--skip-contract-tests|--print-required-files]" >&2
+    echo "usage: $0 [--smoke|--skip-contract-tests|--print-required-files|--print-runtime-dir]" >&2
     exit 2
     ;;
 esac
 
 required_files=(
+  ".gitignore"
   "AGENTS.md"
   "CLAUDE.md"
   "README.md"
@@ -53,6 +60,17 @@ print_required_repository_files() {
   for path in "${required_files[@]}"; do
     printf '%s\n' "$path"
   done
+}
+
+print_default_runtime_dir() {
+  printf '%s\n' "$runtime_output_dir"
+}
+
+validate_runtime_dir_is_ignored() {
+  if ! git check-ignore -q -- "$runtime_output_dir/"; then
+    echo "runtime output dir must be git-ignored: $runtime_output_dir/" >&2
+    exit 1
+  fi
 }
 
 validate_schedule() {
@@ -97,7 +115,13 @@ if [[ "$print_required_files" -eq 1 ]]; then
   exit 0
 fi
 
+if [[ "$print_runtime_dir" -eq 1 ]]; then
+  print_default_runtime_dir
+  exit 0
+fi
+
 validate_required_files
+validate_runtime_dir_is_ignored
 validate_skills
 
 if [[ "$smoke_only" -eq 1 ]]; then
