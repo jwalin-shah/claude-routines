@@ -14,8 +14,22 @@ while IFS= read -r path; do
   cp "$path" "$tmpdir/$path"
 done < <(scripts/check.sh --print-required-files)
 
+git -C "$tmpdir" init -q
+
 "$tmpdir/scripts/check.sh" --smoke >/dev/null
 "$tmpdir/scripts/check.sh" --skip-contract-tests >/dev/null
+
+runtime_dir="$("$tmpdir/scripts/check.sh" --print-runtime-dir)"
+
+if [[ "$runtime_dir" != ".codex-runtime" ]]; then
+  echo "expected default runtime output dir to be .codex-runtime" >&2
+  exit 1
+fi
+
+if ! git -C "$tmpdir" check-ignore -q -- "$runtime_dir/"; then
+  echo "expected default runtime output dir to be git-ignored" >&2
+  exit 1
+fi
 
 invalid_output="$tmpdir/invalid-option.out"
 
