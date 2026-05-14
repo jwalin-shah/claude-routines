@@ -7,7 +7,12 @@ tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
 mkdir -p "$tmpdir/scripts"
-cp -R AGENTS.md CLAUDE.md README.md scripts skills tests "$tmpdir/"
+cp scripts/check.sh "$tmpdir/scripts/"
+
+while IFS= read -r path; do
+  mkdir -p "$tmpdir/$(dirname "$path")"
+  cp "$path" "$tmpdir/$path"
+done < <(scripts/check.sh --print-required-files)
 
 "$tmpdir/scripts/check.sh" --skip-contract-tests >/dev/null
 
