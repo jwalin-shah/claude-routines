@@ -7,6 +7,7 @@ required_files=(
   "AGENTS.md"
   "CLAUDE.md"
   "README.md"
+  "scripts/validate_routines.py"
   "skills/morning-digest/SKILL.md"
   "skills/weekly-recap/SKILL.md"
 )
@@ -18,14 +19,7 @@ for path in "${required_files[@]}"; do
   fi
 done
 
-for skill in skills/*/SKILL.md; do
-  grep -q "^---$" "$skill"
-  grep -q "^name: " "$skill"
-  grep -q "^description: " "$skill"
-  grep -q "^schedule: " "$skill"
-  grep -q "^# " "$skill"
-  grep -q "^## Output format$" "$skill"
-  grep -Eq "(^|[[:space:]])(Post via|Append to) " "$skill"
-done
+python3 scripts/validate_routines.py --self-test skills
+git diff --check HEAD --
 
 echo "claude routines check ok"

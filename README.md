@@ -15,18 +15,21 @@ Anthropic-hosted Claude Code routines. Each routine is represented by one
 - `CLAUDE.md` documents the runtime model and hosted routine constraints.
 - `AGENTS.md` gives repo-local instructions for agents editing this repository.
 - `skills/*/SKILL.md` contains routine frontmatter, steps, and output contracts.
-- `scripts/check.sh` validates the minimal docs and skill contract.
+- `scripts/check.sh` is the authoritative local validation gate.
 - `docs/architecture/` contains portfolio audit artifacts and issue candidates.
 
 ## Validation
 
-Run the lightweight validation contract before opening a PR:
+Run the authoritative local validation gate before opening a PR:
 
 ```bash
 ./scripts/check.sh
-git diff --check
 ```
 
-The check script verifies required repository docs, expected routine files,
-routine frontmatter fields, a basic output-format section, and an explicit
-hosted output destination for each routine.
+The gate verifies required repository docs, expected routine files, and the
+executable routine validator. The validator parses every `skills/*/SKILL.md`
+contract, checks required frontmatter, cron schedule shape, required sections,
+fenced output examples, and an explicit hosted output destination. It also runs
+a negative fixture so the command exits nonzero when that contract is broken.
+The gate also runs `git diff --check HEAD --` to catch whitespace errors in
+staged and unstaged changes before handoff.
