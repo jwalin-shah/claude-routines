@@ -51,4 +51,19 @@ if "$tmpdir/scripts/check.sh" --skip-contract-tests >/dev/null 2>&1; then
   exit 1
 fi
 
+perl -0pi -e 's/schedule: "daily"/schedule: "60 8 * * *"/' \
+  "$tmpdir/skills/morning-digest/SKILL.md"
+
+invalid_schedule_output="$tmpdir/invalid-schedule.out"
+
+if "$tmpdir/scripts/check.sh" --skip-contract-tests >"$invalid_schedule_output" 2>&1; then
+  echo "expected out-of-range routine schedule to fail validation" >&2
+  exit 1
+fi
+
+if ! grep -q "schedule field 1 value out of range: 60" "$invalid_schedule_output"; then
+  echo "expected invalid routine schedule to print a deterministic error" >&2
+  exit 1
+fi
+
 echo "check contract tests ok"
