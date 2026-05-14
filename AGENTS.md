@@ -14,12 +14,14 @@ reviewable because routine behavior is defined directly in `skills/*/SKILL.md`.
 
 ## Validation
 
-Run this before committing:
+Run this authoritative local validation gate before committing:
 
 ```bash
 ./scripts/check.sh
-git diff --check
 ```
 
-`scripts/check.sh` is the repo's lightweight contract check. Update it when new
+`scripts/check.sh` verifies required files and runs the executable routine
+contract validator, including a negative fixture that proves invalid routine
+specs fail the gate. It also runs `git diff --check HEAD --` to catch
+whitespace errors in staged and unstaged changes. Update the gate when new
 routine files or required documentation files are added.
