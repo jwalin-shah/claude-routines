@@ -3,6 +3,20 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+run_contract_tests=1
+
+case "${1:-}" in
+  "")
+    ;;
+  --skip-contract-tests)
+    run_contract_tests=0
+    ;;
+  *)
+    echo "usage: $0 [--skip-contract-tests]" >&2
+    exit 2
+    ;;
+esac
+
 required_files=(
   "AGENTS.md"
   "CLAUDE.md"
@@ -12,12 +26,16 @@ required_files=(
   "tests/check-contract.sh"
 )
 
-for path in "${required_files[@]}"; do
-  if [[ ! -f "$path" ]]; then
-    echo "missing required file: $path" >&2
-    exit 1
-  fi
-done
+validate_required_files() {
+  local path
+
+  for path in "${required_files[@]}"; do
+    if [[ ! -f "$path" ]]; then
+      echo "missing required file: $path" >&2
+      exit 1
+    fi
+  done
+}
 
 validate_schedule() {
   local skill="$1"
@@ -35,7 +53,9 @@ validate_schedule() {
   fi
 }
 
-for skill in skills/*/SKILL.md; do
+validate_skill_contract() {
+  local skill="$1"
+
   grep -q "^---$" "$skill"
   grep -q "^name: " "$skill"
   grep -q "^description: " "$skill"
@@ -44,9 +64,20 @@ for skill in skills/*/SKILL.md; do
   grep -q "^# " "$skill"
   grep -q "^## Output format$" "$skill"
   grep -Eq "(^|[[:space:]])(Post via|Append to) " "$skill"
-done
+}
 
-if [[ "${CLAUDE_ROUTINES_SKIP_CONTRACT_TESTS:-}" != "1" && -x tests/check-contract.sh ]]; then
+validate_skills() {
+  local skill
+
+  for skill in skills/*/SKILL.md; do
+    validate_skill_contract "$skill"
+  done
+}
+
+validate_required_files
+validate_skills
+
+if [[ "$run_contract_tests" -eq 1 && -x tests/check-contract.sh ]]; then
   tests/check-contract.sh
 fi
 
