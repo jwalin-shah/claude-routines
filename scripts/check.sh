@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 run_contract_tests=1
+print_required_files=0
 
 case "${1:-}" in
   "")
@@ -11,8 +12,12 @@ case "${1:-}" in
   --skip-contract-tests)
     run_contract_tests=0
     ;;
+  --print-required-files)
+    print_required_files=1
+    run_contract_tests=0
+    ;;
   *)
-    echo "usage: $0 [--skip-contract-tests]" >&2
+    echo "usage: $0 [--skip-contract-tests|--print-required-files]" >&2
     exit 2
     ;;
 esac
@@ -34,6 +39,14 @@ validate_required_files() {
       echo "missing required file: $path" >&2
       exit 1
     fi
+  done
+}
+
+print_required_repository_files() {
+  local path
+
+  for path in "${required_files[@]}"; do
+    printf '%s\n' "$path"
   done
 }
 
@@ -73,6 +86,11 @@ validate_skills() {
     validate_skill_contract "$skill"
   done
 }
+
+if [[ "$print_required_files" -eq 1 ]]; then
+  print_required_repository_files
+  exit 0
+fi
 
 validate_required_files
 validate_skills

@@ -40,3 +40,23 @@ git diff --check
 
 - `./scripts/check.sh`: passed.
 - `git diff --check`: passed.
+
+## WP-091 Duplicate Logic Consolidation - 2026-05-14
+
+### Scope
+
+- Consolidated required-file discovery for the contract test through
+  `scripts/check.sh`.
+- No routine skill behavior, schedule, MCP tool, or output format changes.
+
+### Change
+
+- Added `./scripts/check.sh --print-required-files` as the canonical required
+  repository file list.
+- Updated `tests/check-contract.sh` to build its temporary validation repo from
+  that canonical list instead of maintaining a parallel copy list.
+
+### Validation Evidence
+
+- `./scripts/check.sh`: passed.
+- `git diff --check`: passed.
