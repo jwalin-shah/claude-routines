@@ -76,6 +76,8 @@ validate_runtime_dir_is_ignored() {
 validate_schedule() {
   local skill="$1"
   local schedule
+  local field_index
+  local bounds
   schedule="$(sed -n 's/^schedule:[[:space:]]*//p' "$skill" | head -n 1)"
 
   if [[ "$schedule" == \"*\" || "$schedule" == \'*\' ]]; then
@@ -87,6 +89,85 @@ validate_schedule() {
     echo "$skill: schedule must be a five-field cron expression" >&2
     exit 1
   fi
+
+  bounds=("0 59" "0 23" "1 31" "1 12" "0 7")
+  for field_index in "${!fields[@]}"; do
+    validate_cron_field "$skill" "$field_index" "${fields[$field_index]}" "${bounds[$field_index]}"
+  done
+}
+
+validate_cron_number() {
+  local skill="$1"
+  local field_index="$2"
+  local value="$3"
+  local min="$4"
+  local max="$5"
+  local number
+
+  if [[ ! "$value" =~ ^[0-9]+$ ]]; then
+    echo "$skill: schedule field $((field_index + 1)) contains invalid cron token: $value" >&2
+    exit 1
+  fi
+
+  number=$((10#$value))
+  if (( number < min || number > max )); then
+    echo "$skill: schedule field $((field_index + 1)) value out of range: $value" >&2
+    exit 1
+  fi
+}
+
+validate_cron_field() {
+  local skill="$1"
+  local field_index="$2"
+  local field="$3"
+  local bound="$4"
+  local min="${bound% *}"
+  local max="${bound#* }"
+  local token
+  local base
+  local step
+  local start
+  local end
+  local tokens
+
+  if [[ "$field" == ","* || "$field" == *"," || "$field" == *",,"* ]]; then
+    echo "$skill: schedule field $((field_index + 1)) contains an empty cron token" >&2
+    exit 1
+  fi
+
+  IFS=',' read -r -a tokens <<< "$field"
+  for token in "${tokens[@]}"; do
+    if [[ -z "$token" ]]; then
+      echo "$skill: schedule field $((field_index + 1)) contains an empty cron token" >&2
+      exit 1
+    fi
+
+    base="$token"
+    step=""
+    if [[ "$token" == */* ]]; then
+      base="${token%%/*}"
+      step="${token#*/}"
+      validate_cron_number "$skill" "$field_index" "$step" 1 999
+    fi
+
+    if [[ "$base" == "*" ]]; then
+      continue
+    fi
+
+    if [[ "$base" == *-* ]]; then
+      start="${base%-*}"
+      end="${base#*-}"
+      validate_cron_number "$skill" "$field_index" "$start" "$min" "$max"
+      validate_cron_number "$skill" "$field_index" "$end" "$min" "$max"
+      if (( 10#$start > 10#$end )); then
+        echo "$skill: schedule field $((field_index + 1)) has a descending cron range: $base" >&2
+        exit 1
+      fi
+      continue
+    fi
+
+    validate_cron_number "$skill" "$field_index" "$base" "$min" "$max"
+  done
 }
 
 validate_skill_contract() {
